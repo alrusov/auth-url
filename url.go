@@ -45,7 +45,7 @@ func init() {
 }
 
 // Проверка валидности дополнительных опций метода
-func (options *methodOptions) Check(cfg interface{}) (err error) {
+func (options *methodOptions) Check(cfg any) (err error) {
 	msgs := misc.NewMessages()
 
 	err = msgs.Error()
