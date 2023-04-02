@@ -122,30 +122,19 @@ func (ah *AuthHandler) Check(id uint64, prefix string, path string, w http.Respo
 
 	p := queryParams.Get("p")
 
-	// Ищем заданного пользователя
-	userDef, exists := ah.authCfg.Users[u]
-	if exists {
-		// Если он найден, проверяем его пароль
-
-		if !ah.options.HashedPassword {
-			// Пароль передается в открытом виде, делаем его hash
-			p = string(auth.Hash([]byte(p), []byte(u)))
-		}
-
-		if userDef.Password == p {
-			return &auth.Identity{
-					Method: module,
-					User:   u,
-					Groups: userDef.Groups,
-					Extra:  nil,
-				},
-				false
-		}
+	identity, _, err := auth.StdCheckUser(u, p, ah.options.HashedPassword)
+	if err != nil {
+		auth.Log.Message(log.INFO, `[%d] URL login error: %s`, id, err)
+		return nil, false
 	}
 
-	log.Message(log.INFO, `[%d] %s login error: Illegal login or password for "%s"`, id, method, u)
+	if identity == nil {
+		auth.Log.Message(log.INFO, `[%d] URL login error: user "%s" not found or illegal password`, id, u)
+		return nil, false
+	}
 
-	return nil, false
+	identity.Method = module
+	return identity, false
 }
 
 //----------------------------------------------------------------------------------------------------------------------------//

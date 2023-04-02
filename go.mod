@@ -1,13 +1,13 @@
 module github.com/alrusov/auth-url
 
-go 1.19
+go 1.20
 
 require (
-	github.com/alrusov/auth v0.1.2
-	github.com/alrusov/config v0.1.47
-	github.com/alrusov/log v0.1.33
-	github.com/alrusov/misc v1.0.65
-	github.com/alrusov/stdhttp v0.1.106
+	github.com/alrusov/auth v0.1.4
+	github.com/alrusov/config v0.1.53
+	github.com/alrusov/log v0.1.37
+	github.com/alrusov/misc v1.1.8
+	github.com/alrusov/stdhttp v0.1.114
 )
 
 require (
