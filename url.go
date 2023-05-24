@@ -111,30 +111,30 @@ func (ah *AuthHandler) WWWAuthHeader() (name string, withRealm bool) {
 //----------------------------------------------------------------------------------------------------------------------------//
 
 // Стандартный вызов - попытка аутентификации данным методом
-func (ah *AuthHandler) Check(id uint64, prefix string, path string, w http.ResponseWriter, r *http.Request) (identity *auth.Identity, tryNext bool) {
+func (ah *AuthHandler) Check(id uint64, prefix string, path string, w http.ResponseWriter, r *http.Request) (identity *auth.Identity, tryNext bool, err error) {
 	queryParams := r.URL.Query()
 
 	u := queryParams.Get("u")
 	if u == "" {
 		// GET параметр u отсутствует, надо проверять следующим по списку методом
-		return nil, true
+		return nil, true, nil
 	}
 
 	p := queryParams.Get("p")
 
-	identity, _, err := auth.StdCheckUser(u, p, ah.options.HashedPassword)
+	identity, _, err = auth.StdCheckUser(u, p, ah.options.HashedPassword)
 	if err != nil {
 		auth.Log.Message(log.INFO, `[%d] URL login error: %s`, id, err)
-		return nil, false
+		return nil, false, err
 	}
 
 	if identity == nil {
 		auth.Log.Message(log.INFO, `[%d] URL login error: user "%s" not found or illegal password`, id, u)
-		return nil, false
+		return nil, false, fmt.Errorf(`user "%s" not found or illegal password`, u)
 	}
 
 	identity.Method = module
-	return identity, false
+	return identity, false, nil
 }
 
 //----------------------------------------------------------------------------------------------------------------------------//
